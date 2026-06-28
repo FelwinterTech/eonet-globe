@@ -94,10 +94,42 @@ function showPopup(coordinates: [number, number], title: string, category: strin
   featureClicked = true;
   setTimeout(() => { featureClicked = false; }, 0);
   activePopup?.remove();
-  const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(title)}`;
+
+  const container = document.createElement('div');
+
+  const titleEl = document.createElement('strong');
+  titleEl.textContent = title;
+  container.appendChild(titleEl);
+
+  const categoryEl = document.createElement('div');
+  categoryEl.className = 'popup-category';
+  categoryEl.textContent = category;
+  container.appendChild(categoryEl);
+
+  const link = document.createElement('a');
+  link.className = 'popup-search-link';
+  link.href = `https://www.google.com/search?q=${encodeURIComponent(title)}`;
+  link.target = '_blank';
+  link.rel = 'noopener';
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('width', '12');
+  svg.setAttribute('height', '12');
+  svg.setAttribute('viewBox', '0 0 20 20');
+  svg.setAttribute('fill', 'currentColor');
+  svg.style.cssText = 'display:inline;vertical-align:-1px;margin-right:4px';
+  const svgPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  svgPath.setAttribute('fill-rule', 'evenodd');
+  svgPath.setAttribute('d', 'M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z');
+  svgPath.setAttribute('clip-rule', 'evenodd');
+  svg.appendChild(svgPath);
+  link.appendChild(svg);
+  link.appendChild(document.createTextNode('Search on Google'));
+  container.appendChild(link);
+
   activePopup = new maplibregl.Popup()
     .setLngLat(coordinates)
-    .setHTML(`<strong>${title}</strong><div class="popup-category">${category}</div><a class="popup-search-link" href="${googleUrl}" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="display:inline;vertical-align:-1px;margin-right:4px"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>Search on Google</a>`)
+    .setDOMContent(container)
     .addTo(map.value!);
   activePopup.on('close', () => { activePopup = null; });
 }
